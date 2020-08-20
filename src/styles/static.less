@@ -64,3 +64,27 @@ body {
     word-break: break-all;
   }
 }
+
+[class*="hair-line"]{
+  position: relative;
+  &:after{
+    touch-action: none;
+    pointer-events: none;
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 200%;
+    height: 200%;
+    transform: scale(0.5);
+  }
+}
+
+.hair-line{
+  &__bottom{
+    &:after{
+      transform-origin: 0 0;
+      border-bottom: 1px solid #e5e5e5;
+    }
+  }
+}

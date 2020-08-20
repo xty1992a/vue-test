@@ -51,34 +51,29 @@
           </div>
         </template>
       </SubList>
-      <div class="cell" @click="openBox = !openBox">
-        <div class="cell__title">标题</div>
-        <div class="cell__value">打开</div>
-      </div>
-      <Collapse duration="10000">
+      <cell border title="标题" value="打开" @click="openBox = !openBox" />
+
+      <collapse>
         <div v-if="openBox">
           <div class="box"></div>
         </div>
-      </Collapse>
-      <div class="cell">
-        <div class="cell__title">标题</div>
-        <div class="cell__value">
-          <popper
-            trigger="clickToOpen"
-            :options="{
-              placement: 'right',
-              modifiers: { offset: { offset: '0,10' } },
-            }"
-          >
-            <div class="popper">
-              <p>增加分组</p>
-            </div>
-            <Icon name="operation" slot="reference" />
-          </popper>
-        </div>
-      </div>
+      </collapse>
+      <cell title="标题" :bubble="{ color: 'green' }">
+        <popper
+          trigger="clickToOpen"
+          :options="{
+            placement: 'right',
+            modifiers: { offset: { offset: '0,10' } },
+          }"
+        >
+          <div class="popper">
+            <p>增加分组</p>
+          </div>
+          <Icon name="operation" slot="reference" />
+        </popper>
+      </cell>
 
-      <SubList :data="subList" />
+      <SubList :data="subList" expand-icon-append />
     </section>
   </div>
 </template>
@@ -151,39 +146,37 @@ export default {
   min-height: 100vh;
   padding: 10px;
   .body {
+    /*width: 500px;*/
     width: 250px;
-    /*height: ~"calc(100vh - 20px)";*/
-    /*overflow: auto;*/
-    /*border: 1px solid #e5e5e5;*/
+    height: ~"calc(100vh - 20px)";
+    overflow: auto;
+    border: 1px solid #e5e5e5;
 
     .title {
       display: flex;
       justify-content: space-between;
     }
     .sub-list {
+      width: 500px;
     }
     .sub-node {
       display: flex;
       height: 100%;
       justify-content: space-between;
+      svg {
+        opacity: 0;
+      }
+      &:hover,
+      &:active {
+        svg {
+          opacity: 1;
+        }
+      }
     }
     .popper-container {
       margin-right: -2em;
       width: 2em;
       text-align: center;
-    }
-  }
-
-  .cell {
-    padding: 10px 15px;
-    display: flex;
-    border-bottom: 1px solid #e5e5e5;
-    &__title {
-      flex: 1;
-    }
-    &__value {
-      flex: 1;
-      text-align: right;
     }
   }
 

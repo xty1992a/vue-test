@@ -32,14 +32,12 @@ export default {
         overflow: hidden;
         height: 0;
       `;
-      console.log("enter", cacheHeight, el.style.cssText);
       setTimeout(() => {
         el.style.cssText = `
         overflow: hidden;
         height: ${cacheHeight}px;
         transition: ${this.duration}ms;
       `;
-        console.log("enter", cacheHeight, el.style.cssText);
         setTimeout(done, this.duration);
       }, 20);
     },
@@ -51,11 +49,11 @@ export default {
       el.style.cssText = `
         height: ${el.clientHeight}px;
       `;
-      console.log("before leave", el.clientHeight, el.style.cssText);
+      // 读取属性,强迫重排
+      el.clientHeight;
     },
     onLeave(el, done) {
       this.$nextTick(() => {
-        console.log("set height zero", this.duration);
         el.style.cssText = `
           height: 0px;
           overflow: hidden;

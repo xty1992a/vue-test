@@ -10,7 +10,7 @@
         class="sub-list__item"
         :class="{ 'sub-list__item__leaf': isLeaf(it) }"
         v-for="(it, index) in list"
-        :key="it[alias.value]"
+        :key="it.value"
       >
         <div
           class="sub-list__panel sub-item"
@@ -18,12 +18,19 @@
             'sub-item__normal': !it.expand && index !== data.length - 1,
             'sub-item__up': it.expand || index === data.length - 1,
           }"
+          :style="{
+            paddingLeft: expandIconAppend ? '2em' : '2.5em',
+          }"
         >
-          <NodeContent :node="it" />
+          <NodeContent :node="{ ...it, children: undefined }" />
           <div
             v-if="!it.isLeaf"
             class="nest-icon"
-            :class="{ 'nest-icon_expand': it.expand }"
+            :class="{
+              'nest-icon__expand': it.expand,
+              'nest-icon__prepend': !expandIconAppend,
+              'nest-icon__append': expandIconAppend,
+            }"
             @click="toggleNest(it)"
           >
             <Icon name="arrow_down" />
@@ -31,7 +38,7 @@
         </div>
 
         <Collapse duration="150">
-          <sub-list v-if="it.expand" :data="it[alias.children]" />
+          <sub-list v-if="it.expand" :data="it.children" />
         </Collapse>
       </li>
     </ul>
@@ -66,7 +73,7 @@ export default {
         ) : root.$scopedSlots.node ? (
           root.$scopedSlots.node(this.node)
         ) : (
-          <span>{this.node[parent.alias.name]}</span>
+          <span>{this.node.name}</span>
         );
       },
     },
@@ -84,6 +91,7 @@ export default {
     },
     // 通过props的方式定义节点展示形式
     renderNode: Function,
+    expandIconAppend: Boolean,
   },
   data() {
     return {
@@ -106,8 +114,8 @@ export default {
         const expand = !isLeaf && this.expandItemKeys.includes(it[value]);
 
         return {
-          [name]: it[name],
-          [value]: it[value],
+          name: it[name],
+          value: it[value],
           expand,
           isLeaf,
           children: expand
@@ -209,7 +217,6 @@ export default {
       width: 2em;
       position: absolute;
       bottom: 0;
-      right: 0;
       top: 0;
       cursor: pointer;
 
@@ -217,17 +224,29 @@ export default {
       align-items: center;
       justify-content: center;
 
+      &__append {
+        right: 0;
+        svg {
+          transform: rotate(90deg);
+        }
+      }
+      &__prepend {
+        left: 0.5em;
+        svg {
+          transform: rotate(-90deg);
+        }
+      }
+
       .icon-arrow_down {
         font-size: 10px;
         color: #333;
       }
       svg {
-        transform: rotate(90deg);
         transition: 0.2s;
       }
-      &_expand {
+      &__expand {
         svg {
-          transform: rotate(0deg);
+          transform: rotate(0deg) !important;
         }
       }
     }
