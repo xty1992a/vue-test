@@ -1,7 +1,7 @@
 <template>
   <div class="test">
-    <section class="body">
-      <SubList :data="subList">
+    <section class="aside">
+      <SubList accordion :data="subList">
         <template #title>
           <div class="title">
             <span>全部客服</span>
@@ -79,7 +79,23 @@
         </popper>
       </cell>
 
-      <SubList :data="subList" expand-icon-append />
+      <SubList :data="subList" expand-icon-append :render-node="renderNode" />
+    </section>
+    <section>
+      <checkbox
+        :value="isCheckAll"
+        :indeterminate="indeterminate"
+        @change="checkAll"
+        >全选</checkbox
+      >
+      <checkbox-group v-model="checkedKeys">
+        <checkbox
+          v-for="it in checkboxList"
+          :key="it.value"
+          :label="it.label"
+          :value="it.value"
+        />
+      </checkbox-group>
     </section>
   </div>
 </template>
@@ -97,6 +113,7 @@ export default {
         {
           name: "李四",
           value: "2",
+          expand: true,
           children: [
             { name: "李四-早班", value: "2-1" },
             { name: "李四-中班", value: "2-2" },
@@ -108,6 +125,7 @@ export default {
         {
           name: "刘七",
           value: "5",
+          expand: true,
           children: [
             { name: "刘七-早班", value: "5-1" },
             { name: "刘七-中班", value: "5-2" },
@@ -136,10 +154,40 @@ export default {
       ],
 
       openBox: true,
+      testValue: false,
+
+      checkedKeys: ["sing"],
+      checkboxList: [
+        { label: "唱", value: "sing" },
+        { label: "跳", value: "jump" },
+        { label: "rap", value: "rap" },
+        { label: "打篮球", value: "ball" },
+      ],
     };
   },
-  computed: {},
-  methods: {},
+  computed: {
+    indeterminate() {
+      return [this.checkboxList.length, 0].every(
+        (v) => v !== this.checkedKeys.length
+      );
+    },
+    isCheckAll() {
+      return this.checkedKeys.length === this.checkboxList.length;
+    },
+  },
+  methods: {
+    renderNode(h, { node }) {
+      return <div>{node.name}__render</div>;
+    },
+
+    checkAll() {
+      if (this.isCheckAll) {
+        this.checkedKeys = [];
+        return;
+      }
+      this.checkedKeys = this.checkboxList.map((it) => it.value);
+    },
+  },
   watch: {},
   created() {},
   mounted() {},
@@ -151,7 +199,10 @@ export default {
 .test {
   min-height: 100vh;
   padding: 10px;
-  .body {
+
+  display: flex;
+
+  .aside {
     /*width: 500px;*/
     width: 250px;
     height: ~"calc(100vh - 20px)";
@@ -184,26 +235,25 @@ export default {
       width: 2em;
       text-align: center;
     }
+    .popper-container {
+      .popper {
+        padding: 5px 0;
+        p {
+          line-height: 30px;
+          width: 90px;
+          text-align: center;
+          cursor: pointer;
+          &:hover {
+            background-color: #d9e8fc;
+          }
+        }
+      }
+    }
   }
 
   .box {
     height: 300px;
     background-color: #f7f7f7;
-  }
-
-  .popper-container {
-    .popper {
-      padding: 5px 0;
-      p {
-        line-height: 30px;
-        width: 90px;
-        text-align: center;
-        cursor: pointer;
-        &:hover {
-          background-color: #d9e8fc;
-        }
-      }
-    }
   }
 }
 </style>

@@ -8,7 +8,7 @@
     <ul class="sub-list__list">
       <li
         class="sub-list__item"
-        :class="{ 'sub-list__item__leaf': isLeaf(it) }"
+        :class="{ 'sub-list__item__leaf': it.isLeaf }"
         v-for="(it, index) in list"
         :key="it.value"
       >
@@ -38,7 +38,15 @@
         </div>
 
         <Collapse duration="150">
-          <sub-list v-if="it.expand" :data="it.children" />
+          <sub-list
+            v-if="it.expand"
+            v-bind="{
+              expandIconAppend,
+              alias,
+              accordion,
+              data: it.children,
+            }"
+          />
         </Collapse>
       </li>
     </ul>
@@ -65,8 +73,8 @@ export default {
       render(h) {
         const parent = this.$parent;
         const root = parent.root;
-        return parent.renderNode ? (
-          parent.renderNode.call(parent._renderProxy, h, {
+        return root.renderNode ? (
+          root.renderNode.call(root._renderProxy, h, {
             _self: root.$vnode.context,
             node: this.node,
           })
@@ -91,7 +99,8 @@ export default {
     },
     // 通过props的方式定义节点展示形式
     renderNode: Function,
-    expandIconAppend: Boolean,
+    expandIconAppend: Boolean, // 展开按钮位置改为右侧
+    accordion: Boolean, // 最多只能展开一个节点
   },
   data() {
     return {
@@ -121,7 +130,7 @@ export default {
           children: expand
             ? it[children].map((it) => ({
                 ...it,
-                children: Object.freeze(it.children),
+                [children]: Object.freeze(it.children),
               }))
             : undefined,
         };
@@ -129,24 +138,32 @@ export default {
     },
   },
   methods: {
-    // 检查item是否是叶子节点(没有children)
+    // 检查item是否是叶子节点(声明是叶子或没有children)
     isLeaf(item) {
       return (
-        item[this.alias.children] === undefined ||
-        item[this.alias.children].length === 0
+        item?.isLeaf ??
+        (item[this.alias.children] === undefined ||
+          item[this.alias.children].length === 0)
       );
     },
 
     // 将item[key]加入展开组
     toggleNest(item) {
       const key = this.alias.value;
+      const accordion = this.accordion;
       const expand = this.expandItemKeys.includes(item[key]);
       if (expand) {
         this.expandItemKeys = this.expandItemKeys.filter(
           (it) => it !== item[key]
         );
+        if (accordion) {
+          this.expandItemKeys = [];
+        }
       } else {
         this.expandItemKeys.push(item[key]);
+        if (accordion) {
+          this.expandItemKeys = [item[key]];
+        }
       }
     },
 
@@ -159,6 +176,9 @@ export default {
           this.expandItemKeys.push(it[this.alias.value]);
       });
       this.expandItemKeys = [...new Set(this.expandItemKeys)];
+      if (this.accordion) {
+        this.expandItemKeys = this.expandItemKeys.slice(0, 1);
+      }
     },
   },
   watch: {

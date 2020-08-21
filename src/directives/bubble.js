@@ -31,12 +31,12 @@ class Bubble {
     el.classList.add("v-bubble");
 
     el.style.cssText = `
-      	--wave-duration: ${duration};
+		--bubble-duration: ${duration};
+		--bubble-opacity: ${opacity};
 		--bubble-color: ${color};
-		--wave-size: ${size}px;
-      	--offset-y: ${y}px;
-      	--offset-x: ${x}px;
-      	--wave-opacity: ${opacity};
+		--bubble-size: ${size}px;
+		--bubble-y: ${y}px;
+		--bubble-x: ${x}px;
       `;
   };
 
@@ -61,7 +61,6 @@ class Bubble {
       ...dftBinding,
       ...options,
     };
-    console.log("set option", this.$options);
   }
 
   static BubbleMap = {};
@@ -99,8 +98,7 @@ const directive = {
 
   update(el, binding) {
     const bubble = Bubble.getInstance(el);
-    if (!bubble) return;
-    bubble.setOptions(binding.value);
+    bubble && bubble.setOptions(binding.value);
   },
 
   unbind(el) {
@@ -108,14 +106,18 @@ const directive = {
   },
 };
 
+const install = (Vue, options = {}) => {
+  // set initial binding
+  Object.keys(options).forEach((k) => (dftBinding[k] = options[k]));
+  Vue.directive(dftBinding.directive, directive);
+};
+
 export default {
-  install(Vue, options = {}) {
-    // set initial binding
-    Object.keys(options).forEach((k) => (dftBinding[k] = options[k]));
-    Vue.directive(dftBinding.directive, directive);
-  },
+  install,
 
   ...directive,
-
-  name: dftBinding.directive,
 };
+
+if (window && window.Vue) {
+  window.Vue.use({ install });
+}

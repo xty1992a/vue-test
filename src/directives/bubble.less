@@ -1,31 +1,31 @@
 .v-bubble {
-  --offset-x: 0;
-  --offset-y: 0;
-  --wave-size: 100px;
+  --bubble-x: 0;
+  --bubble-y: 0;
+  --bubble-size: 100px;
   --bubble-color: orange;
-  --wave-duration: 500ms;
-  --wave-opacity: 1;
+  --bubble-duration: 500ms;
+  --bubble-opacity: 1;
   position: relative;
   overflow: hidden;
 
   &:before {
+    content: "";
     pointer-events: none;
     touch-action: none;
-    content: '';
     position: absolute;
-    left: calc(var(--offset-x) - (var(--wave-size) / 2));
-    top: calc(var(--offset-y) - (var(--wave-size) / 2));
+    left: calc(var(--bubble-x) - (var(--bubble-size) / 2));
+    top: calc(var(--bubble-y) - (var(--bubble-size) / 2));
     background-color: var(--bubble-color);
-    width: var(--wave-size);
-    height: var(--wave-size);
+    width: var(--bubble-size);
+    height: var(--bubble-size);
     border-radius: 50%;
-    animation: wave var(--wave-duration);
+    animation: bubble var(--bubble-duration);
   }
 
-  @keyframes wave {
+  @keyframes bubble {
     from {
       transform: scale(0);
-      opacity: var(--wave-opacity);
+      opacity: var(--bubble-opacity);
     }
     to {
       transform: scale(1);
@@ -33,4 +33,3 @@
     }
   }
 }
-
