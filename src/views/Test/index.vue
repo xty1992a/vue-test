@@ -54,7 +54,7 @@
       <cell
         border
         title="标题"
-        clickable
+        :clickable="openBox"
         :value="openBox ? '关闭' : '打开'"
         @click="openBox = !openBox"
       />
@@ -64,7 +64,7 @@
           <div class="box"></div>
         </div>
       </collapse>
-      <cell title="标题" :bubble="{ color: 'green' }" clickable>
+      <cell title="标题" :bubble="{ color: 'red', opacity: 0.6 }" clickable>
         <popper
           trigger="clickToOpen"
           :options="{

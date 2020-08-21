@@ -1,13 +1,11 @@
 import bubble from "./bubble";
 
-const directives = {
-  [bubble.name]: bubble,
-};
+const directives = [bubble];
 
 export default {
   install: function (Vue) {
-    Object.keys(directives).forEach((key) => {
-      Vue.directive(key, directives[key]);
+    directives.forEach((obj) => {
+      obj.install ? Vue.use(obj) : Vue.directive(obj.name, obj);
     });
   },
 };

@@ -6,23 +6,22 @@ const dftBinding = {
   size: 100,
   duration: "500ms",
   disabled: false,
+  directive: "bubble",
+  opacity: 1,
 };
 
-const callbackMap = {};
+class Bubble {
+  constructor(el, options) {
+    this.$el = el;
+    this.setOptions(options);
+    this.listen();
+  }
 
-function bindCallback(el, binding) {
-  removeCallback(el);
+  onClick = (e) => {
+    const el = this.$el;
+    const { duration, color, size, disabled, opacity } = this.$options;
+    if (disabled) return;
 
-  if (binding.disabled) return;
-
-  const clickKey = rdm();
-  const animateKey = rdm();
-
-  el.dataset.callback = [clickKey, animateKey].join(",");
-
-  const { duration, color, size } = binding;
-
-  const onClick = (e) => {
     const rect = el.getBoundingClientRect();
     const { clientX, clientY } = e;
 
@@ -37,59 +36,86 @@ function bindCallback(el, binding) {
 		--wave-size: ${size}px;
       	--offset-y: ${y}px;
       	--offset-x: ${x}px;
+      	--wave-opacity: ${opacity};
       `;
   };
 
-  const onAnimateEnd = (e) => {
+  onAnimateEnd = () => {
+    const el = this.$el;
     el.style.cssText = "";
     el.classList.remove("v-bubble");
   };
 
-  callbackMap[clickKey] = onClick;
-  callbackMap[animateKey] = onAnimateEnd;
+  listen() {
+    this.$el.addEventListener("click", this.onClick);
+    this.$el.addEventListener("animationend", this.onAnimateEnd);
+  }
 
-  el.addEventListener("click", onClick);
-  el.addEventListener("animationend", onAnimateEnd);
+  unListen() {
+    this.$el.removeEventListener("click", this.onClick);
+    this.$el.removeEventListener("animationend", this.onAnimateEnd);
+  }
+
+  setOptions(options = {}) {
+    this.$options = {
+      ...dftBinding,
+      ...options,
+    };
+    console.log("set option", this.$options);
+  }
+
+  static BubbleMap = {};
+
+  static getInstance(el) {
+    const key = el.dataset.bubble;
+    return Bubble.BubbleMap[key];
+  }
+
+  static setInstance(instance) {
+    const el = instance.$el;
+    const key = rdm();
+    el.dataset.bubble = key;
+    Bubble.BubbleMap[key] = instance;
+    return key;
+  }
+
+  static delInstance(el) {
+    const instance = Bubble.getInstance(el);
+    if (!instance) return;
+    instance.unListen();
+    const key = instance.$el.dataset.bubble;
+    Bubble.BubbleMap[key] = null;
+  }
 }
 
-function removeCallback(el) {
-  if (!el.dataset.callback) return;
-  const [clickKey, animateKey] = el.dataset.callback.split(",");
-  if (clickKey) {
-    callbackMap[clickKey] = null;
-    el.removeEventListener(clickKey, callbackMap[clickKey]);
-  }
-  if (animateKey) {
-    callbackMap[animateKey] = null;
-    el.removeEventListener(animateKey, callbackMap[animateKey]);
-  }
-}
-
-export default {
+const directive = {
   bind(el, binding) {
     if (!supportCssVar) {
-      return console.error("浏览器不支持css变量");
+      return console.error("It`s 2020 you still use this suck browser??");
     }
-
-    bindCallback(el, {
-      ...dftBinding,
-      ...(binding.value || {}),
-    });
+    const bubble = new Bubble(el, binding.value);
+    Bubble.setInstance(bubble);
   },
 
   update(el, binding) {
-    if (!supportCssVar) {
-      return console.error("浏览器不支持css变量");
-    }
-    bindCallback(el, {
-      ...dftBinding,
-      ...(binding.value || {}),
-    });
+    const bubble = Bubble.getInstance(el);
+    if (!bubble) return;
+    bubble.setOptions(binding.value);
   },
 
   unbind(el) {
-    removeCallback(el);
+    Bubble.delInstance(el);
+  },
+};
+
+export default {
+  install(Vue, options = {}) {
+    // set initial binding
+    Object.keys(options).forEach((k) => (dftBinding[k] = options[k]));
+    Vue.directive(dftBinding.directive, directive);
   },
 
-  name: "bubble",
+  ...directive,
+
+  name: dftBinding.directive,
 };

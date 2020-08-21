@@ -1,17 +1,19 @@
-.v-bubble{
+.v-bubble {
   --offset-x: 0;
   --offset-y: 0;
   --wave-size: 100px;
   --bubble-color: orange;
   --wave-duration: 500ms;
+  --wave-opacity: 1;
   position: relative;
   overflow: hidden;
-  &:before{
+
+  &:before {
     pointer-events: none;
     touch-action: none;
     content: '';
     position: absolute;
-    left:calc(var(--offset-x) - (var(--wave-size) / 2));
+    left: calc(var(--offset-x) - (var(--wave-size) / 2));
     top: calc(var(--offset-y) - (var(--wave-size) / 2));
     background-color: var(--bubble-color);
     width: var(--wave-size);
@@ -19,15 +21,16 @@
     border-radius: 50%;
     animation: wave var(--wave-duration);
   }
+
+  @keyframes wave {
+    from {
+      transform: scale(0);
+      opacity: var(--wave-opacity);
+    }
+    to {
+      transform: scale(1);
+      opacity: 0;
+    }
+  }
 }
 
-@keyframes wave {
-  from{
-    transform: scale(0) ;
-    opacity: 1;
-  }
-  to{
-    transform: scale(1)  ;
-    opacity: 0;
-  }
-}
