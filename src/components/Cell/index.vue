@@ -3,7 +3,7 @@
     class="cell"
     :class="{ 'hair-line__bottom': border }"
     v-on="$listeners"
-    v-bubble="bubble"
+    v-bubble="localBubble"
   >
     <div class="cell__title">
       <slot name="title">{{ title }}</slot>
@@ -26,11 +26,19 @@ export default {
       type: Object,
       default: () => null,
     },
+    clickable: Boolean,
   },
   data() {
     return {};
   },
-  computed: {},
+  computed: {
+    localBubble() {
+      return {
+        ...this.bubble,
+        disabled: !this.clickable,
+      };
+    },
+  },
   methods: {},
   watch: {},
   created() {},

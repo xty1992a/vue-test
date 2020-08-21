@@ -1,16 +1,19 @@
-import { rdm } from "@/utils";
+import { rdm, supportCssVar } from "@/utils";
 import "./bubble.less";
 
 const dftBinding = {
   color: "orange",
   size: 100,
   duration: "500ms",
+  disabled: false,
 };
 
 const callbackMap = {};
 
 function bindCallback(el, binding) {
   removeCallback(el);
+
+  if (binding.disabled) return;
 
   const clickKey = rdm();
   const animateKey = rdm();
@@ -30,8 +33,8 @@ function bindCallback(el, binding) {
 
     el.style.cssText = `
       	--wave-duration: ${duration};
-		--wave-size: ${size}px;
 		--bubble-color: ${color};
+		--wave-size: ${size}px;
       	--offset-y: ${y}px;
       	--offset-x: ${x}px;
       `;
@@ -64,6 +67,10 @@ function removeCallback(el) {
 
 export default {
   bind(el, binding) {
+    if (!supportCssVar) {
+      return console.error("浏览器不支持css变量");
+    }
+
     bindCallback(el, {
       ...dftBinding,
       ...(binding.value || {}),
@@ -71,11 +78,17 @@ export default {
   },
 
   update(el, binding) {
-    console.log("update");
+    if (!supportCssVar) {
+      return console.error("浏览器不支持css变量");
+    }
     bindCallback(el, {
       ...dftBinding,
       ...(binding.value || {}),
     });
+  },
+
+  unbind(el) {
+    removeCallback(el);
   },
 
   name: "bubble",

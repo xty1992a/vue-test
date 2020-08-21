@@ -51,14 +51,20 @@
           </div>
         </template>
       </SubList>
-      <cell border title="标题" value="打开" @click="openBox = !openBox" />
+      <cell
+        border
+        title="标题"
+        clickable
+        :value="openBox ? '关闭' : '打开'"
+        @click="openBox = !openBox"
+      />
 
       <collapse>
         <div v-if="openBox">
           <div class="box"></div>
         </div>
       </collapse>
-      <cell title="标题" :bubble="{ color: 'green' }">
+      <cell title="标题" :bubble="{ color: 'green' }" clickable>
         <popper
           trigger="clickToOpen"
           :options="{
