@@ -1,8 +1,8 @@
 <template>
   <div class="sub-list">
-    <h3 class="sub-list__title sub-list__panel" v-if="!isNest">
+    <h3 class="sub-list__title sub-list__panel" v-if="isRoot">
       <slot name="title">
-        <span>全部客服</span>
+        <span>{{ title }}</span>
       </slot>
     </h3>
     <ul class="sub-list__list">
@@ -97,6 +97,7 @@ export default {
         children: "children",
       }),
     },
+    title: String,
     // 通过props的方式定义节点展示形式
     renderNode: Function,
     expandIconAppend: Boolean, // 展开按钮位置改为右侧
@@ -109,10 +110,10 @@ export default {
     };
   },
   computed: {
-    // 检查自己是否是递归嵌套组件
-    isNest() {
+    // 检查自己是否是根节点
+    isRoot() {
       const self = findParent(this, this.$options.name);
-      return self !== null;
+      return self === null;
     },
 
     // 用于展示的数据,非展开时减少children(以避免不必要的reactive)
@@ -191,11 +192,11 @@ export default {
   },
   created() {
     // 为递归组件提供一个根节点
-    if (this.isNest) {
+    if (this.isRoot) {
+      this.root = this;
+    } else {
       const root = findParent(this, this.$options.name);
       this.root = root.root;
-    } else {
-      this.root = this;
     }
   },
   mounted() {},

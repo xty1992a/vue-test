@@ -79,7 +79,7 @@
         </popper>
       </cell>
 
-      <SubList :data="subList" expand-icon-append :render-node="renderNode" />
+      <SubList :data="tree" :render-node="renderNode" />
     </section>
     <section>
       <checkbox
@@ -103,6 +103,8 @@
 <script>
 import SubList from "@/components/SubList";
 import Collapse from "@/components/Collapse";
+import { makeTree } from "@/utils/test";
+
 export default {
   name: "test",
   components: { SubList, Collapse },
@@ -152,6 +154,8 @@ export default {
           ],
         },
       ],
+
+      tree: Object.freeze(makeTree(3, 10)),
 
       openBox: true,
       testValue: false,
@@ -203,10 +207,10 @@ export default {
   display: flex;
 
   .aside {
-    /*width: 500px;*/
-    width: 250px;
-    height: ~"calc(100vh - 20px)";
-    overflow: auto;
+    width: 500px;
+    /*width: 250px;*/
+    /*height: ~"calc(100vh - 20px)";*/
+    /*overflow: auto;*/
     border: 1px solid #e5e5e5;
 
     .title {

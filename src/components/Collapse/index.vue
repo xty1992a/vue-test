@@ -13,7 +13,6 @@
 <script>
 export default {
   name: "collapse",
-  components: {},
   props: {
     duration: {
       type: [Number, String],
@@ -21,10 +20,6 @@ export default {
       validator: (v) => !isNaN(+v),
     },
   },
-  data() {
-    return {};
-  },
-  computed: {},
   methods: {
     onEnter(el, done) {
       const cacheHeight = el.clientHeight;
@@ -44,7 +39,6 @@ export default {
     afterEnter(el) {
       el.style.cssText = "";
     },
-
     beforeLeave(el) {
       el.style.cssText = `
         height: ${el.clientHeight}px;
@@ -66,9 +60,5 @@ export default {
       el.style.cssText = "";
     },
   },
-  watch: {},
-  created() {},
-  mounted() {},
-  beforeDestroy() {},
 };
 </script>
