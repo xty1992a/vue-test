@@ -72,6 +72,8 @@ export default {
 <style lang="less" rel="stylesheet/less">
 .checkbox {
   margin-right: 30px;
+  line-height: 1;
+  cursor: pointer;
 
   &__inner {
     width: 1em;

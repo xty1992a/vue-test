@@ -18,10 +18,15 @@
             'sub-item__normal': !it.expand && index !== data.length - 1,
             'sub-item__up': it.expand || index === data.length - 1,
           }"
-          :style="{
-            paddingLeft: expandIconAppend ? '2em' : '2.5em',
-          }"
+          :style="indent"
         >
+          <div class="sub-item__checkbox">
+            <Checkbox
+              v-if="pickable"
+              :value="it.checked"
+              @input="(v) => onCheck(it, v)"
+            />
+          </div>
           <NodeContent :node="{ ...it, children: undefined }" />
           <div
             v-if="!it.isLeaf"
@@ -45,6 +50,7 @@
               alias,
               accordion,
               data: it.children,
+              pickable,
             }"
           />
         </Collapse>
@@ -61,11 +67,15 @@ const findParent = (vm, name) => {
   return null;
 };
 
+import Checkbox from "@/components/Checkbox";
 import Collapse from "@/components/Collapse";
+import CheckBox from "./Checkbox";
+
 export default {
   name: "sub-list",
   components: {
     Collapse,
+    Checkbox,
     NodeContent: {
       props: {
         node: Object,
@@ -86,6 +96,7 @@ export default {
       },
     },
   },
+  mixins: [CheckBox],
   props: {
     data: Array,
     // 属性别名
@@ -102,6 +113,7 @@ export default {
     renderNode: Function,
     expandIconAppend: Boolean, // 展开按钮位置改为右侧
     accordion: Boolean, // 最多只能展开一个节点
+    pickable: Boolean,
   },
   data() {
     return {
@@ -110,6 +122,22 @@ export default {
     };
   },
   computed: {
+    indent() {
+      const { expandIconAppend, pickable } = this;
+
+      let left = 2;
+      if (expandIconAppend) {
+        left += 0.5;
+      }
+      if (pickable) {
+        left += 1.5;
+      }
+
+      return {
+        paddingLeft: left + "em",
+      };
+    },
+
     // 检查自己是否是根节点
     isRoot() {
       const self = findParent(this, this.$options.name);
@@ -123,18 +151,25 @@ export default {
         const isLeaf = this.isLeaf(it);
         const expand = !isLeaf && this.expandItemKeys.includes(it[value]);
 
-        return {
+        const item = {
           name: it[name],
           value: it[value],
           expand,
           isLeaf,
-          children: expand
-            ? it[children].map((it) => ({
-                ...it,
-                [children]: Object.freeze(it.children),
-              }))
-            : undefined,
         };
+
+        if (expand) {
+          item.children = it[children].map((it) => ({
+            ...it,
+            [children]: Object.freeze(it.children),
+          }));
+        }
+
+        if (this.pickable) {
+          item.checked = this.isCheck(item, it);
+        }
+
+        return item;
       });
     },
   },
@@ -198,6 +233,7 @@ export default {
       const root = findParent(this, this.$options.name);
       this.root = root.root;
     }
+    this.checkboxSetup();
   },
   mounted() {},
   beforeDestroy() {},
@@ -294,6 +330,15 @@ export default {
       width: 1em;
       border-bottom: 1px solid;
       transform: scaleY(0.5);
+    }
+
+    &__checkbox {
+      position: absolute;
+      left: 2.2em;
+      top: 0;
+      bottom: 0;
+      display: flex;
+      align-items: center;
     }
 
     &__normal {

@@ -1,7 +1,7 @@
 <template>
   <div class="test">
     <section class="aside">
-      <SubList accordion :data="subList">
+      <SubList accordion :data="subList" pickable>
         <template #title>
           <div class="title">
             <span>全部客服</span>
@@ -82,20 +82,20 @@
       <SubList :data="tree" :render-node="renderNode" />
     </section>
     <section>
-      <checkbox
-        :value="isCheckAll"
-        :indeterminate="indeterminate"
-        @change="checkAll"
-        >全选</checkbox
-      >
-      <checkbox-group v-model="checkedKeys">
-        <checkbox
-          v-for="it in checkboxList"
-          :key="it.value"
-          :label="it.label"
-          :value="it.value"
-        />
-      </checkbox-group>
+      <!--      <checkbox-->
+      <!--        :value="isCheckAll"-->
+      <!--        :indeterminate="indeterminate"-->
+      <!--        @change="checkAll"-->
+      <!--        >全选</checkbox-->
+      <!--      >-->
+      <!--      <checkbox-group v-model="checkedKeys">-->
+      <!--        <checkbox-->
+      <!--          v-for="it in checkboxList"-->
+      <!--          :key="it.value"-->
+      <!--          :label="it.label"-->
+      <!--          :value="it.value"-->
+      <!--        />-->
+      <!--      </checkbox-group>-->
     </section>
   </div>
 </template>
