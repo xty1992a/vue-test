@@ -3,10 +3,18 @@ import Collapse from "@/components/Collapse";
 import SubList from "@/components/SubList";
 import Checkbox from "@/components/Checkbox";
 import CheckboxGroup from "@/components/CheckboxGroup";
+import ColorPicker from "@/components/ColorPicker";
 import Popper from "vue-popperjs";
 import "vue-popperjs/dist/vue-popper.css";
 
-const components = [Cell, SubList, Collapse, Checkbox, CheckboxGroup];
+const components = [
+  Cell,
+  SubList,
+  Collapse,
+  Checkbox,
+  CheckboxGroup,
+  ColorPicker,
+];
 
 export default {
   install(Vue) {

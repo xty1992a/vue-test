@@ -81,7 +81,7 @@
 
       <SubList :data="tree" :render-node="renderNode" />
     </section>
-    <section>
+    <section class="body">
       <!--      <checkbox-->
       <!--        :value="isCheckAll"-->
       <!--        :indeterminate="indeterminate"-->
@@ -96,6 +96,12 @@
       <!--          :value="it.value"-->
       <!--        />-->
       <!--      </checkbox-group>-->
+      <div>
+        <color-picker v-model="color" />
+        <div class="color-box" :style="{ backgroundColor: color }">
+          {{ color }}
+        </div>
+      </div>
     </section>
   </div>
 </template>
@@ -167,6 +173,7 @@ export default {
         { label: "rap", value: "rap" },
         { label: "打篮球", value: "ball" },
       ],
+      color: "#ff7300",
     };
   },
   computed: {
@@ -252,6 +259,15 @@ export default {
           }
         }
       }
+    }
+  }
+
+  .body {
+    padding: 8px;
+    flex: 1;
+    .color-box {
+      width: 50px;
+      height: 50px;
     }
   }
 
