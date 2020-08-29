@@ -40,6 +40,10 @@ export class Color {
     return color;
   }
 
+  static joinRgb(r, g, b) {
+    return `rgb(${r},${g},${b})`;
+  }
+
   static hue2rgb(p, q, t) {
     if (t < 0) t += 1;
     if (t > 1) t -= 1;
@@ -105,7 +109,7 @@ export class Color {
         .join("");
     }
     const [r, g, b] = Helper.chunkString(color, 2).map(Num.toNormal);
-    return `rgb(${r},${g},${b})`;
+    return this.joinRgb(r, g, b);
   }
 
   static rgb2hex(color) {
@@ -119,7 +123,7 @@ export class Color {
   }
 
   // hsv/hsb转换
-  static hsv2Rgb(h, s, v) {
+  static hsv2Rgb(h, s, v, join = false) {
     s = s / 100;
     v = v / 100;
     var r = 0,
@@ -167,7 +171,7 @@ export class Color {
     r = parseInt(r * 255.0);
     g = parseInt(g * 255.0);
     b = parseInt(b * 255.0);
-    return [r, g, b];
+    return join ? this.joinRgb(r, g, b) : [r, g, b];
   }
   static rgb2Hsv(r, g, b) {
     r = r / 255;
@@ -234,8 +238,8 @@ class Helper {
   return colors.every((v) => Num.toNormal(v) <= 255 && Num.toNormal(v) >= 0);*/
 
 // 生成色相环
-export function createHueRing() {
-  const cvs = document.createElement("canvas");
+export function createHueRing(cvs) {
+  cvs = cvs || document.createElement("canvas");
   cvs.id = "cvs";
   cvs.height = 360;
   cvs.width = 1;

@@ -173,7 +173,7 @@ export default {
         { label: "rap", value: "rap" },
         { label: "打篮球", value: "ball" },
       ],
-      color: "#ff7300",
+      color: "#41addb",
     };
   },
   computed: {

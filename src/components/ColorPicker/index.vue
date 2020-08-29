@@ -1,10 +1,11 @@
 <template>
   <div class="color-picker">
     <Movable class="s-v-wrap" v-model="svPosition">
-      <div
-        class="s-l-range"
+      <!--   <div
+        class="sv-map"
         :style="{ backgroundImage: `url(${svMapImage})` }"
-      ></div>
+      ></div>-->
+      <canvas ref="sv-map" class="sv-map" />
       <div class="point" slot="handler"></div>
     </Movable>
 
@@ -14,10 +15,11 @@
       v-model="hueRingPosition"
       @move="throttleHueCb"
     >
-      <div
-        class="hue-ring"
-        :style="{ backgroundImage: `url(${hueRingImage})` }"
-      ></div>
+      <canvas ref="hue" class="hue-ring" />
+      <!--      <div-->
+      <!--        class="hue-ring"-->
+      <!--        :style="{ backgroundImage: `url(${hueRingImage})` }"-->
+      <!--      ></div>-->
       <div class="slide" slot="handler"></div>
     </Movable>
   </div>
@@ -28,6 +30,7 @@ import Movable from "@/components/Movable";
 import * as helper from "./helper";
 const { Color } = helper;
 import * as utils from "@/utils/index";
+import { HueCanvas, SVMapCanvas } from "./bg-canvas";
 
 export default {
   name: "color-picker",
@@ -65,19 +68,17 @@ export default {
       },
       set({ x, y }) {
         const hue = Math.min(Math.max(+(y * 360).toFixed(2), 0), 359);
-
-        const [h, s, v] = this.hsvColor;
-
+        const [, s, v] = this.hsvColor;
         this.emitValue(hue, s, v);
       },
     },
 
     svPosition: {
+      // 此处的坐标是标准坐标,原点在左下角,非左上角
       get() {
-        let [hue, x, y] = this.hsvColor;
+        let [, x, y] = this.hsvColor;
         x /= 100;
         y /= 100;
-
         return {
           x,
           y: 1 - y,
@@ -85,6 +86,7 @@ export default {
       },
       set({ x, y }) {
         const [h] = this.hsvColor;
+        console.log("sv change", h, x, y);
         this.throttleEmit(h, x * 100, (1 - y) * 100);
       },
     },
@@ -103,8 +105,7 @@ export default {
   methods: {
     // 将新的颜色向上派发
     emitValue(h, s, v) {
-      const [r, g, b] = Color.hsv2Rgb(h, s, v);
-      let color = `rgb(${r},${g},${b})`;
+      let color = Color.hsv2Rgb(h, s, v, true);
       if (this.colorType === "hex") {
         color = Color.rgb2hex(color);
       }
@@ -112,7 +113,22 @@ export default {
     },
 
     onHueChange() {
-      this.svMapImage = helper.createSVMap(this.hsvColor[0] || 0);
+      const hue = this.hsvColor[0] || 0;
+      // this.svMapImage = helper.createSVMap(this.hsvColor[0] || 0);
+      this.svMap.draw(hue);
+    },
+
+    setup() {
+      // 创建色相表
+      new HueCanvas(this.$refs["hue"], {
+        width: 20,
+        height: 360,
+      });
+      // 创建饱和度/明度表
+      this.svMap = new SVMapCanvas(this.$refs["sv-map"], {
+        width: 100,
+        height: 100,
+      });
     },
   },
   watch: {},
@@ -120,9 +136,11 @@ export default {
     // 节流高频事件
     this.throttleEmit = utils.throttle(this.emitValue, 16);
     this.throttleHueCb = utils.throttle(this.onHueChange, 16);
+  },
+  mounted() {
+    this.setup();
     this.onHueChange();
   },
-  mounted() {},
   beforeDestroy() {},
 };
 </script>
@@ -134,7 +152,7 @@ export default {
 
   .s-v-wrap {
     margin-right: 10px;
-    .s-l-range {
+    .sv-map {
       width: 300px;
       height: 300px;
       box-shadow: 0 0 1px #333;
